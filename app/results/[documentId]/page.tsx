@@ -119,6 +119,14 @@ export default function ResultsPage({
           ))}
         </div>
 
+        <div className="mt-8 flex justify-center">
+          <Link href={`/flowchart/${params.documentId}`}>
+            <Button size="lg" variant="secondary">
+              📊 View Process Flowchart
+            </Button>
+          </Link>
+        </div>
+
         {clauses.length === 0 && (
           <div className="text-center text-muted-foreground">
             <p>No clauses found for this document.</p>
