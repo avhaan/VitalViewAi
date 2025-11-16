@@ -72,6 +72,13 @@ export default function HomePage() {
             <Link href="#about" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
               About
             </Link>
+            <Link href="/nearby-care" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium flex items-center gap-1">
+              <span>📍</span>
+              Find Care
+            </Link>
+            <Link href="/bmi" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
+              BMI Calculator
+            </Link>
             <Link href="#upload" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
               Upload Report
             </Link>
@@ -344,6 +351,109 @@ export default function HomePage() {
                 </p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Access Tools */}
+      <section className="py-20 px-6 bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-[#1A1A1A] mb-4">
+              Quick Access Tools
+            </h2>
+            <p className="text-xl text-gray-600">
+              Essential healthcare tools at your fingertips
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Find Care Near You Card */}
+            <Link href="/nearby-care">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="group relative overflow-hidden bg-white backdrop-blur-xl border-2 border-teal-200 rounded-3xl p-8 hover:shadow-2xl hover:border-teal-400 transition-all cursor-pointer h-full"
+              >
+                <div className="absolute top-0 right-0 text-8xl opacity-5 group-hover:opacity-10 transition-opacity">
+                  🧭
+                </div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform">
+                    📍
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3">
+                    Find Care Near You
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Locate the closest hospitals, clinics, and pharmacies instantly using your location.
+                  </p>
+                  <div className="inline-flex items-center text-teal-600 font-semibold group-hover:gap-3 gap-2 transition-all">
+                    Get Started
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </motion.div>
+            </Link>
+
+            {/* BMI Calculator Card */}
+            <Link href="/bmi">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                viewport={{ once: true }}
+                className="group relative overflow-hidden bg-white backdrop-blur-xl border-2 border-purple-200 rounded-3xl p-8 hover:shadow-2xl hover:border-purple-400 transition-all cursor-pointer h-full"
+              >
+                <div className="absolute top-0 right-0 text-8xl opacity-5 group-hover:opacity-10 transition-opacity">
+                  ⚖️
+                </div>
+                <div className="relative z-10">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform">
+                    📏
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3">
+                    BMI Calculator
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Calculate your Body Mass Index and understand your health metrics.
+                  </p>
+                  <div className="inline-flex items-center text-purple-600 font-semibold group-hover:gap-3 gap-2 transition-all">
+                    Calculate Now
+                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </div>
+                </div>
+              </motion.div>
+            </Link>
+
+            {/* Coming Soon Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+              className="group relative overflow-hidden bg-white backdrop-blur-xl border-2 border-gray-200 rounded-3xl p-8 opacity-60 h-full"
+            >
+              <div className="absolute top-0 right-0 text-8xl opacity-5">
+                🔮
+              </div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl flex items-center justify-center text-4xl mb-6">
+                  💊
+                </div>
+                <h3 className="text-2xl font-bold text-[#1A1A1A] mb-3">
+                  Medication Tracker
+                </h3>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  Track your prescriptions and get reminders. Coming soon!
+                </p>
+                <div className="inline-flex items-center text-gray-500 font-semibold gap-2">
+                  Coming Soon
+                  <span className="text-xl">⏳</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>

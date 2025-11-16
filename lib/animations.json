@@ -1,0 +1,57 @@
+{
+  "chickAnimations": {
+    "idle": {
+      "splineEvent": "Idle",
+      "description": "Chick blinks and sways gently"
+    },
+    "thinking": {
+      "splineEvent": "Thinking",
+      "description": "Chick taps head with wing, looks contemplative"
+    },
+    "talking": {
+      "splineEvent": "Talking",
+      "description": "Chick beak moves, points with wing"
+    },
+    "happy": {
+      "splineEvent": "Happy",
+      "description": "Chick smiles, small hop, sparkles appear"
+    },
+    "concerned": {
+      "splineEvent": "Concerned",
+      "description": "Chick frowns slightly, tilts head"
+    },
+    "alert": {
+      "splineEvent": "Alert",
+      "description": "Chick shakes head, shows worried expression"
+    },
+    "bounce": {
+      "splineEvent": "Bounce",
+      "description": "Chick hops excitedly when new message arrives"
+    }
+  },
+  "triggers": {
+    "newMessage": "bounce",
+    "aiThinking": "thinking",
+    "normalResult": "happy",
+    "warningResult": "concerned",
+    "criticalResult": "alert",
+    "explaining": "talking"
+  },
+  "healthMetricMappings": {
+    "hemoglobin": {
+      "low": { "status": "warning", "chickState": "concerned" },
+      "normal": { "status": "normal", "chickState": "happy" },
+      "high": { "status": "warning", "chickState": "concerned" }
+    },
+    "glucose": {
+      "low": { "status": "critical", "chickState": "alert" },
+      "normal": { "status": "normal", "chickState": "happy" },
+      "high": { "status": "warning", "chickState": "concerned" }
+    },
+    "cholesterol": {
+      "low": { "status": "normal", "chickState": "happy" },
+      "normal": { "status": "normal", "chickState": "happy" },
+      "high": { "status": "warning", "chickState": "concerned" }
+    }
+  }
+}

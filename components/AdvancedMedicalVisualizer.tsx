@@ -3,6 +3,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, RadialBarChart, RadialBar } from 'recharts';
 import { motion } from 'framer-motion';
 import React from 'react';
+import MetricExplainerPopup from './MetricExplainerPopup';
 
 interface TestData {
   testName: string;
@@ -24,9 +25,37 @@ interface Props {
   reportType?: string;
 }
 
+// Helper function to extract numeric value from patientValue (handles objects, strings, numbers)
+function getNumericValue(value: any): number {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+  if (typeof value === 'object' && value !== null) {
+    // For objects like {systolic: 152, diastolic: 94}, take the first numeric value
+    const firstValue = Object.values(value)[0];
+    return getNumericValue(firstValue);
+  }
+  return 0;
+}
+
+// Helper function to display patientValue (handles objects, strings, numbers)
+function displayValue(value: any): string {
+  if (typeof value === 'object' && value !== null) {
+    // For objects like {systolic: 152, diastolic: 94}, format as "152/94"
+    return Object.values(value).join('/');
+  }
+  return String(value);
+}
+
 // Test Tube Visualization
 function TestTubeViz({ test }: { test: TestData }) {
-  const fillPercentage = Math.min(((test.patientValue - test.normalMin) / (test.normalMax - test.normalMin)) * 100, 100);
+  const numericValue = getNumericValue(test.patientValue);
+  // Balanced range - shows 50-70% for high values
+  const rangeMax = Math.max(numericValue * 1.5, test.normalMax * 2.0);
+  const fillPercentage = Math.max((numericValue / rangeMax) * 100, 10); // Min 10% for visibility
+  
   const getColor = () => {
     if (test.severity === 'critical') return '#dc2626';
     if (test.severity === 'concerning') return '#ea580c';
@@ -35,13 +64,13 @@ function TestTubeViz({ test }: { test: TestData }) {
   };
 
   return (
-    <div className="relative w-24 h-40 mx-auto">
+    <div className="relative w-24 h-48 mx-auto mb-4">
       {/* Test tube body */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-32 bg-white dark:bg-slate-800 border-3 border-gray-300 dark:border-gray-600 rounded-b-full overflow-hidden">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-14 h-32 bg-white dark:bg-slate-800 border-3 border-gray-300 dark:border-gray-600 rounded-b-full overflow-hidden">
         {/* Liquid fill with animation */}
         <motion.div
           initial={{ height: 0 }}
-          animate={{ height: `${Math.max(fillPercentage, 10)}%` }}
+          animate={{ height: `${fillPercentage}%` }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute bottom-0 w-full rounded-b-full"
           style={{ backgroundColor: getColor() }}
@@ -63,9 +92,9 @@ function TestTubeViz({ test }: { test: TestData }) {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-6 bg-gray-400 dark:bg-gray-600 rounded-t-lg"></div>
       
       {/* Value label */}
-      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-center">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center w-full">
         <div className="text-xl font-bold" style={{ color: getColor() }}>
-          {test.patientValue}
+          {displayValue(test.patientValue)}
         </div>
         <div className="text-xs text-gray-500">{test.unit}</div>
       </div>
@@ -75,8 +104,17 @@ function TestTubeViz({ test }: { test: TestData }) {
 
 // Gauge Meter Visualization
 function GaugeViz({ test }: { test: TestData }) {
-  const percentage = ((test.patientValue - test.normalMin) / (test.normalMax - test.normalMin)) * 100;
-  const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+  const numericValue = getNumericValue(test.patientValue);
+  // Balanced range - shows 50-70% for high values
+  const rangeMin = 0;
+  const rangeMax = Math.max(numericValue * 1.5, test.normalMax * 2.0);
+  
+  // Calculate percentage based on full range
+  const percentage = (numericValue / rangeMax) * 100;
+  
+  // Calculate where normal range sits on the gauge
+  const normalMinPercent = (test.normalMin / rangeMax) * 100;
+  const normalMaxPercent = (test.normalMax / rangeMax) * 100;
   
   const getColor = () => {
     if (test.severity === 'critical') return '#dc2626';
@@ -86,12 +124,12 @@ function GaugeViz({ test }: { test: TestData }) {
   };
 
   const data = [
-    { name: 'value', value: clampedPercentage, fill: getColor() },
+    { name: 'value', value: percentage, fill: getColor() },
   ];
 
   return (
-    <div className="w-full">
-      <ResponsiveContainer width="100%" height={130}>
+    <div className="w-full mb-2">
+      <ResponsiveContainer width="100%" height={150}>
         <RadialBarChart
           cx="50%"
           cy="70%"
@@ -115,7 +153,7 @@ function GaugeViz({ test }: { test: TestData }) {
             className="text-3xl font-bold"
             fill={getColor()}
           >
-            {test.patientValue}
+            {displayValue(test.patientValue)}
           </text>
           <text
             x="50%"
@@ -128,12 +166,20 @@ function GaugeViz({ test }: { test: TestData }) {
           </text>
         </RadialBarChart>
       </ResponsiveContainer>
+      
+      {/* Normal range indicator */}
+      <div className="mt-3 text-center">
+        <p className="text-xs text-gray-500 font-medium">
+          Normal: {test.normalMin}-{test.normalMax} {test.unit}
+        </p>
+      </div>
     </div>
   );
 }
 
 // Line Graph with Trend
 function LineGraphViz({ test }: { test: TestData }) {
+  const numericValue = getNumericValue(test.patientValue);
   const data = test.historicalValues && test.historicalValues.length > 0
     ? test.historicalValues.map((value, index) => ({
         name: `Test ${index + 1}`,
@@ -141,7 +187,7 @@ function LineGraphViz({ test }: { test: TestData }) {
       }))
     : [
         { name: 'Previous', value: test.normalMin + (test.normalMax - test.normalMin) / 2 },
-        { name: 'Current', value: test.patientValue },
+        { name: 'Current', value: numericValue },
       ];
 
   const getColor = () => {
@@ -162,7 +208,7 @@ function LineGraphViz({ test }: { test: TestData }) {
         </defs>
         <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
         <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-        <YAxis tick={{ fontSize: 10 }} domain={[0, Math.max(test.normalMax * 1.5, test.patientValue * 1.2)]} />
+        <YAxis tick={{ fontSize: 10 }} domain={[0, Math.max(test.normalMax * 1.5, numericValue * 1.2)]} />
         <Tooltip />
         <Area
           type="monotone"
@@ -250,32 +296,37 @@ export default function AdvancedMedicalVisualizer({ test, reportType }: Props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="my-4"
+      className="mb-6"
     >
       {/* Header */}
-      <div className={`relative bg-gradient-to-br ${getHeaderColor()} rounded-t-xl p-4 text-white`}>
+      <div className={`relative bg-gradient-to-br ${getHeaderColor()} rounded-t-xl p-5 text-white`}>
         <div className="absolute inset-0 bg-black opacity-10 rounded-t-xl"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <div className="text-2xl mb-1">{test.icon || '🩺'}</div>
-            <h3 className="text-lg font-bold">{test.testName}</h3>
+            <div className="flex items-center">
+              <h3 className="text-lg font-bold">{test.testName}</h3>
+              <MetricExplainerPopup metricName={test.testName} category={test.category} />
+            </div>
             <p className="text-xs opacity-90">{test.category}</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{test.patientValue}</div>
+            <div className="text-3xl font-bold">
+              {displayValue(test.patientValue)}
+            </div>
             <div className="text-xs opacity-90">{test.unit}</div>
           </div>
         </div>
       </div>
 
       {/* Visualization Body */}
-      <div className="bg-white dark:bg-slate-900 rounded-b-xl shadow-xl border-x border-b border-gray-200 dark:border-slate-700 p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-b-xl shadow-xl border-x border-b border-gray-200 dark:border-slate-700 p-6">
         {renderVisualization()}
 
         {/* Normal Range Info */}
-        <div className="mt-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-lg">
+        <div className="mt-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700 rounded-lg">
           <div className="text-center">
-            <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">Normal Range</div>
+            <div className="text-xs text-gray-600 dark:text-gray-300 mb-1.5">Normal Range</div>
             <div className="text-sm font-bold text-gray-800 dark:text-gray-100">
               {test.normalMin} - {test.normalMax} {test.unit}
             </div>
@@ -284,8 +335,8 @@ export default function AdvancedMedicalVisualizer({ test, reportType }: Props) {
 
         {/* Trend indicator */}
         {test.trend && (
-          <div className="mt-3 text-center">
-            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+          <div className="mt-4 text-center">
+            <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium ${
               test.trend === 'increasing' ? 'bg-red-50 text-red-700' :
               test.trend === 'decreasing' ? 'bg-blue-50 text-blue-700' :
               'bg-gray-50 text-gray-700'

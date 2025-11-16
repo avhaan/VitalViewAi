@@ -11,6 +11,31 @@ import MedicalChartVisualizer from '@/components/MedicalChartVisualizer';
 import AdvancedMedicalVisualizer from '@/components/AdvancedMedicalVisualizer';
 import { parseVisualAidsFromText } from '@/lib/parseVisualAids';
 
+// Helper function to parse inline markdown (bold text)
+function parseInlineMarkdown(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  const regex = /\*\*(.*?)\*\*/g;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the match
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Add bold text
+    parts.push(<strong key={match.index} className="font-bold text-gray-900 dark:text-gray-100">{match[1]}</strong>);
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+}
+
 interface FlowchartNode {
   id: string;
   label: string;
@@ -30,8 +55,8 @@ function FlowchartRenderer({ data }: { data: FlowchartData }) {
   const nodeHeight = 60;
 
   // Calculate SVG dimensions
-  const maxX = Math.max(...data.nodes.map(n => n.position.x));
-  const maxY = Math.max(...data.nodes.map(n => n.position.y));
+  const maxX = Array.isArray(data.nodes) && data.nodes.length > 0 ? Math.max(...data.nodes.map(n => n.position.x)) : 0;
+  const maxY = Array.isArray(data.nodes) && data.nodes.length > 0 ? Math.max(...data.nodes.map(n => n.position.y)) : 0;
   const width = maxX + nodeWidth + padding * 2;
   const height = maxY + nodeHeight + padding * 2;
 
@@ -71,7 +96,7 @@ function FlowchartRenderer({ data }: { data: FlowchartData }) {
     <div className="overflow-x-auto rounded-lg border border-border bg-white">
       <svg width={width} height={height} className="min-w-full">
         {/* Draw connections between nodes */}
-        {data.nodes.map((node, idx) => {
+        {Array.isArray(data.nodes) && data.nodes.map((node, idx) => {
           if (idx < data.nodes.length - 1) {
             const nextNode = data.nodes[idx + 1];
             const x1 = node.position.x + padding + nodeWidth / 2;
@@ -110,7 +135,7 @@ function FlowchartRenderer({ data }: { data: FlowchartData }) {
         </defs>
 
         {/* Draw nodes */}
-        {data.nodes.map((node) => (
+        {Array.isArray(data.nodes) && data.nodes.map((node) => (
           <g key={node.id}>
             <path
               d={getNodeShape(node)}
@@ -251,8 +276,10 @@ export default function FlowchartPage({
               <div className="text-8xl mb-4">🩺</div>
             </div>
           </div>
-          <Spinner />
-          <h2 className="mt-6 text-2xl font-bold text-gray-800 dark:text-gray-100">
+          <div className="flex justify-center mb-6">
+            <Spinner className="w-8 h-8 text-indigo-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
             Analyzing Your Medical Report
           </h2>
           <p className="mt-3 text-gray-600 dark:text-gray-400">
@@ -361,7 +388,7 @@ export default function FlowchartPage({
                   🫁 Affected Systems/Organs
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {vizData.affectedOrgans.map((organ: string, idx: number) => (
+                  {Array.isArray(vizData.affectedOrgans) && vizData.affectedOrgans.map((organ: string, idx: number) => (
                     <span
                       key={idx}
                       className="px-4 py-2 bg-white dark:bg-slate-800 rounded-full text-sm font-medium border border-indigo-200 dark:border-indigo-700"
@@ -374,8 +401,8 @@ export default function FlowchartPage({
             )}
             
             {/* Advanced Visualizations - 2x2 Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {vizData.tests.map((test: any, index: number) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {Array.isArray(vizData.tests) && vizData.tests.map((test: any, index: number) => (
                 <AdvancedMedicalVisualizer 
                   key={index} 
                   test={test} 
@@ -459,12 +486,13 @@ export default function FlowchartPage({
                       continue;
                     }
 
-                    // Section headings (## heading)
+                    // Section headings (##)
                     if (line.match(/^## /)) {
+                      const headingText = line.replace(/^## /, '');
                       elements.push(
                         <h2 key={idx} className="font-bold text-2xl mt-8 mb-4 text-gray-800 dark:text-gray-100 border-b-2 border-indigo-200 dark:border-indigo-800 pb-3 flex items-center gap-2">
                           <span className="text-indigo-500">▸</span>
-                          {line.replace(/^## /, '')}
+                          {parseInlineMarkdown(headingText)}
                         </h2>
                       );
                       continue;
@@ -472,10 +500,11 @@ export default function FlowchartPage({
 
                     // Subsection headings (### with emoji)
                     if (line.match(/^### 🔹/)) {
+                      const subheadingText = line.replace(/^### /, '');
                       elements.push(
                         <div key={idx} className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4 my-4 border-l-4 border-blue-500">
                           <h3 className="font-bold text-xl text-blue-700 dark:text-blue-300">
-                            {line.replace(/^### /, '')}
+                            {parseInlineMarkdown(subheadingText)}
                           </h3>
                         </div>
                       );
@@ -494,10 +523,11 @@ export default function FlowchartPage({
 
                     // Bullet points
                     if (line.match(/^[•\-]/)) {
+                      const bulletText = line.replace(/^[•\-]\s*/, '');
                       elements.push(
                         <div key={idx} className="ml-6 my-2 flex items-start gap-2">
                           <span className="text-indigo-500 mt-1">●</span>
-                          <span className="flex-1">{line.replace(/^[•\-]\s*/, '')}</span>
+                          <span className="flex-1">{parseInlineMarkdown(bulletText)}</span>
                         </div>
                       );
                       continue;
@@ -507,7 +537,7 @@ export default function FlowchartPage({
                     if (line.match(/^\s{2,}/)) {
                       elements.push(
                         <div key={idx} className="ml-8 my-1 text-sm text-gray-600 dark:text-gray-400 italic">
-                          {line}
+                          {parseInlineMarkdown(line)}
                         </div>
                       );
                       continue;
@@ -517,7 +547,7 @@ export default function FlowchartPage({
                     if (line.trim()) {
                       elements.push(
                         <p key={idx} className="my-3 text-gray-700 dark:text-gray-300 leading-relaxed">
-                          {line}
+                          {parseInlineMarkdown(line)}
                         </p>
                       );
                       continue;

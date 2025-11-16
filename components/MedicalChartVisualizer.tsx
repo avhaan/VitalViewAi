@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Area, AreaChart, RadialBarChart, RadialBar, Legend, PieChart, Pie } from 'recharts';
 import { motion } from 'framer-motion';
+import MetricExplainerPopup from './MetricExplainerPopup';
 
 interface VisualAidData {
   type: string;
@@ -35,13 +36,17 @@ export default function MedicalChartVisualizer({ data }: Props) {
   };
 
   const statusInfo = getStatus();
-  const percentage = ((patientValue - normalMin) / (normalMax - normalMin)) * 100;
+  
+  // Balanced range - shows 50-70% for high values
+  const rangeMin = 0;
+  const rangeMax = Math.max(patientValue * 1.5, normalMax * 2.0);
+  const percentage = (patientValue / rangeMax) * 100;
 
   // Data for radial progress
   const radialData = [
     {
       name: testName,
-      value: Math.min(Math.max(percentage, 0), 100),
+      value: percentage,
       fill: statusInfo.color,
     },
   ];
@@ -72,15 +77,18 @@ export default function MedicalChartVisualizer({ data }: Props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="my-4 overflow-hidden"
+      className="mb-8 overflow-hidden"
     >
       {/* Header with animated gradient background */}
-      <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-t-xl p-4 text-white overflow-hidden">
+      <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-t-xl p-5 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold mb-1">{testName}</h3>
+              <div className="flex items-center mb-1">
+                <h3 className="text-lg font-bold">{testName}</h3>
+                <MetricExplainerPopup metricName={testName} category="Clinical Test" />
+              </div>
               <p className="text-blue-100 text-xs">Clinical Test Result</p>
             </div>
             <motion.div
@@ -97,7 +105,7 @@ export default function MedicalChartVisualizer({ data }: Props) {
 
       <div className="bg-white dark:bg-slate-900 rounded-b-xl shadow-xl border border-gray-200 dark:border-slate-700">
         {/* Large Value Display */}
-        <div className="p-4 text-center border-b border-gray-100 dark:border-slate-800">
+        <div className="p-6 text-center border-b border-gray-100 dark:border-slate-800">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -114,8 +122,8 @@ export default function MedicalChartVisualizer({ data }: Props) {
           </motion.div>
         </div>
 
-        {/* Visual Charts Grid */}
-        <div className="grid md:grid-cols-2 gap-4 p-4">
+        {/* Two Column Charts Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5">
           {/* Radial Progress Chart */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -127,7 +135,7 @@ export default function MedicalChartVisualizer({ data }: Props) {
             <ResponsiveContainer width="100%" height={130}>
               <RadialBarChart
                 cx="50%"
-                cy="50%"
+                cy="70%"
                 innerRadius="60%"
                 outerRadius="100%"
                 barSize={20}
@@ -143,7 +151,7 @@ export default function MedicalChartVisualizer({ data }: Props) {
                 />
                 <text
                   x="50%"
-                  y="50%"
+                  y="65%"
                   textAnchor="middle"
                   dominantBaseline="middle"
                   className="text-3xl font-bold"
@@ -195,7 +203,7 @@ export default function MedicalChartVisualizer({ data }: Props) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="m-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg border-l-4 border-blue-500"
+            className="m-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 rounded-lg border-l-4 border-blue-500"
           >
             <div className="flex items-start gap-2">
               <div className="text-xl">💡</div>
@@ -212,7 +220,7 @@ export default function MedicalChartVisualizer({ data }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="p-3 text-center"
+          className="p-4 pb-5 text-center"
         >
           {patientValue >= normalMin && patientValue <= normalMax ? (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full text-xs font-bold shadow-md transform hover:scale-105 transition-transform">

@@ -123,3 +123,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+}
+
+/* Hide v0.dev injected elements */
+iframe[src*="v0.dev"],
+iframe[src*="v0.app"],
+div[class*="v0"],
+button[class*="v0"],
+[data-v0],
+[data-vercel-deployment-id] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
