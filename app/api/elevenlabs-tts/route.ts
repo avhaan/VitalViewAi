@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const requestBody = {
       text: cleanText,
-      model_id: 'eleven_monolingual_v1', // More stable than turbo
+      model_id: 'eleven_turbo_v2_5', // FREE TIER COMPATIBLE - fast and reliable
       voice_settings: {
         stability: 0.5,
         similarity_boost: 0.75,
