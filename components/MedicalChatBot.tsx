@@ -419,13 +419,6 @@ export default function MedicalChatBot() {
                   )}
                 </button>
                 <button
-                  onClick={() => setMuteAnimations(!muteAnimations)}
-                  className="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors text-sm"
-                  title={muteAnimations ? 'Enable animations' : 'Mute animations'}
-                >
-                  {muteAnimations ? '🔇' : '🔊'}
-                </button>
-                <button
                   onClick={() => setIsOpen(false)}
                   className="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-colors"
                 >

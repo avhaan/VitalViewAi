@@ -83,8 +83,7 @@ export default function NearbyCare() {
             <Link href="/" className="text-gray-700 hover:text-teal-600 transition-colors font-medium">
               Home
             </Link>
-            <Link href="/nearby-care" className="text-teal-600 font-semibold flex items-center gap-1">
-              <span>📍</span>
+            <Link href="/nearby-care" className="text-teal-600 font-semibold">
               Find Care
             </Link>
             <Link href="/bmi" className="text-gray-700 hover:text-teal-600 transition-colors font-medium">

@@ -72,8 +72,7 @@ export default function HomePage() {
             <Link href="#about" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
               About
             </Link>
-            <Link href="/nearby-care" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium flex items-center gap-1">
-              <span>📍</span>
+            <Link href="/nearby-care" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
               Find Care
             </Link>
             <Link href="/bmi" className="text-[#1A1A1A] hover:text-[#0B7BD6] transition-colors font-medium">
