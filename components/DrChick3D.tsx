@@ -115,171 +115,161 @@ export default function DrChick3D({ animationState }: DrChick3DProps) {
     }
   });
 
-  // Memoize expensive calculations
-  const mainBodyColor = useMemo(() => new THREE.Color('#FFE066'), []);
-  const beakColor = useMemo(() => new THREE.Color('#FF8C42'), []);
-  const feetColor = useMemo(() => new THREE.Color('#FF8C42'), []);
+  // KAWAII color palette - soft and pastel
+  const mainBodyColor = useMemo(() => new THREE.Color('#FFF4D6'), []); // Softer yellow
+  const beakColor = useMemo(() => new THREE.Color('#FFB84D'), []); // Warm orange
+  const feetColor = useMemo(() => new THREE.Color('#FFAA5C'), []); // Peachy orange
 
   return (
     <group ref={chickGroup} position={[0, 0.2, 0]} scale={0.9}>
-      {/* Main Body - Smooth glossy sphere */}
+      {/* Main Body - Soft matte kawaii style */}
       <Sphere ref={bodyRef} args={[1, 64, 64]} position={[0, 0, 0]} castShadow receiveShadow>
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           color={mainBodyColor}
-          roughness={0.15}
-          metalness={0.05}
-          clearcoat={0.4}
-          clearcoatRoughness={0.2}
-          emissive={"#FFE066"}
-          emissiveIntensity={0.08}
+          roughness={0.8}
+          metalness={0}
+          emissive={"#FFF8E1"}
+          emissiveIntensity={0.05}
         />
       </Sphere>
 
       {/* Head group for better control */}
       <group ref={headRef} position={[0, 0.6, 0.5]}>
         
-        {/* Eyes with shine */}
-        <group position={[0, 0.15, 0.3]}>
-          {/* Left Eye Base */}
-          <Sphere ref={leftEyeRef} args={[0.15, 32, 32]} position={[-0.28, 0, 0]} castShadow>
-            <meshStandardMaterial
-              color="#1A1A1A"
-              roughness={0.3}
-              metalness={0.1}
-            />
-          </Sphere>
-          {/* Left Eye Shine */}
-          <Sphere args={[0.06, 16, 16]} position={[-0.26, 0.06, 0.12]}>
-            <meshStandardMaterial
-              color="white"
-              emissive="white"
-              emissiveIntensity={1}
-            />
-          </Sphere>
+        {/* KAWAII Eyes - Big and sparkly */}
+        <group position={[0, 0.2, 0.4]}>
+          {/* Left Eye - Bigger, rounder */}
+          <group position={[-0.25, 0, 0]}>
+            {/* Eye white base */}
+            <Sphere args={[0.18, 32, 32]} castShadow>
+              <meshStandardMaterial color="#1A1A1A" roughness={0.5} />
+            </Sphere>
+            {/* Big sparkle (top-left) */}
+            <Sphere ref={leftEyeRef} args={[0.08, 16, 16]} position={[-0.05, 0.07, 0.15]} scale-y={1}>
+              <meshStandardMaterial
+                color="white"
+                emissive="white"
+                emissiveIntensity={2}
+              />
+            </Sphere>
+            {/* Small sparkle (bottom-right) */}
+            <Sphere args={[0.04, 12, 12]} position={[0.06, -0.04, 0.16]}>
+              <meshStandardMaterial
+                color="white"
+                emissive="white"
+                emissiveIntensity={1.5}
+              />
+            </Sphere>
+          </group>
           
-          {/* Right Eye Base */}
-          <Sphere ref={rightEyeRef} args={[0.15, 32, 32]} position={[0.28, 0, 0]} castShadow>
-            <meshStandardMaterial
-              color="#1A1A1A"
-              roughness={0.3}
-              metalness={0.1}
-            />
-          </Sphere>
-          {/* Right Eye Shine */}
-          <Sphere args={[0.06, 16, 16]} position={[0.30, 0.06, 0.12]}>
-            <meshStandardMaterial
-              color="white"
-              emissive="white"
-              emissiveIntensity={1}
-            />
-          </Sphere>
+          {/* Right Eye - Bigger, rounder */}
+          <group position={[0.25, 0, 0]}>
+            {/* Eye white base */}
+            <Sphere args={[0.18, 32, 32]} castShadow>
+              <meshStandardMaterial color="#1A1A1A" roughness={0.5} />
+            </Sphere>
+            {/* Big sparkle (top-left) */}
+            <Sphere ref={rightEyeRef} args={[0.08, 16, 16]} position={[-0.05, 0.07, 0.15]} scale-y={1}>
+              <meshStandardMaterial
+                color="white"
+                emissive="white"
+                emissiveIntensity={2}
+              />
+            </Sphere>
+            {/* Small sparkle (bottom-right) */}
+            <Sphere args={[0.04, 12, 12]} position={[0.06, -0.04, 0.16]}>
+              <meshStandardMaterial
+                color="white"
+                emissive="white"
+                emissiveIntensity={1.5}
+              />
+            </Sphere>
+          </group>
         </group>
 
-        {/* Beak - Two parts for talking animation */}
-        <group position={[0, -0.05, 0.45]}>
-          {/* Top beak */}
-          <mesh ref={beakTopRef} castShadow>
-            <coneGeometry args={[0.15, 0.25, 16]} />
-            <meshPhysicalMaterial
+        {/* Simple cute beak - kawaii style */}
+        <group position={[0, 0, 0.5]}>
+          {/* Small rounded beak */}
+          <mesh ref={beakTopRef} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <coneGeometry args={[0.08, 0.15, 16]} />
+            <meshStandardMaterial
               color={beakColor}
-              roughness={0.4}
-              metalness={0.1}
-              clearcoat={0.2}
+              roughness={0.6}
             />
           </mesh>
-          {/* Bottom beak */}
-          <mesh ref={beakBottomRef} position={[0, -0.05, 0]} castShadow>
-            <coneGeometry args={[0.12, 0.18, 16]} />
-            <meshPhysicalMaterial
+          {/* Tiny bottom part */}
+          <mesh ref={beakBottomRef} position={[0, -0.08, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <coneGeometry args={[0.06, 0.1, 16]} />
+            <meshStandardMaterial
               color={beakColor}
-              roughness={0.4}
-              metalness={0.1}
+              roughness={0.6}
             />
           </mesh>
         </group>
       </group>
 
-      {/* Cute blush marks */}
-      <Sphere args={[0.18, 24, 24]} position={[-0.65, 0.35, 0.72]} castShadow>
+      {/* KAWAII blush marks - bigger and pinker */}
+      <Sphere args={[0.22, 24, 24]} position={[-0.7, 0.25, 0.75]} castShadow>
         <meshStandardMaterial
-          color="#FFB8D1"
+          color="#FFC0E0"
           transparent
-          opacity={0.7}
+          opacity={0.85}
           roughness={1}
           emissive="#FFB8D1"
-          emissiveIntensity={0.1}
+          emissiveIntensity={0.15}
         />
       </Sphere>
-      <Sphere args={[0.18, 24, 24]} position={[0.65, 0.35, 0.72]} castShadow>
+      <Sphere args={[0.22, 24, 24]} position={[0.7, 0.25, 0.75]} castShadow>
         <meshStandardMaterial
-          color="#FFB8D1"
+          color="#FFC0E0"
           transparent
-          opacity={0.7}
+          opacity={0.85}
           roughness={1}
           emissive="#FFB8D1"
-          emissiveIntensity={0.1}
+          emissiveIntensity={0.15}
         />
       </Sphere>
 
-      {/* Top tuft - Cute hair */}
-      <group position={[0, 1.05, 0]}>
-        <Sphere args={[0.22, 32, 32]} position={[0, 0, 0]} castShadow>
-          <meshPhysicalMaterial
+      {/* Fluffy kawaii tuft - softer and rounder */}
+      <group position={[0, 1.08, 0]}>
+        <Sphere args={[0.25, 32, 32]} position={[0, 0, 0]} castShadow>
+          <meshStandardMaterial
             color={mainBodyColor}
-            roughness={0.2}
-            clearcoat={0.3}
+            roughness={0.9}
           />
         </Sphere>
-        <Sphere args={[0.16, 24, 24]} position={[-0.15, 0.12, 0]} castShadow>
-          <meshPhysicalMaterial
+        <Sphere args={[0.18, 24, 24]} position={[-0.18, 0.15, 0]} castShadow>
+          <meshStandardMaterial
             color={mainBodyColor}
-            roughness={0.25}
+            roughness={0.9}
           />
         </Sphere>
-        <Sphere args={[0.14, 24, 24]} position={[0.15, 0.1, 0]} castShadow>
-          <meshPhysicalMaterial
+        <Sphere args={[0.16, 24, 24]} position={[0.18, 0.13, 0]} castShadow>
+          <meshStandardMaterial
             color={mainBodyColor}
-            roughness={0.25}
+            roughness={0.9}
           />
         </Sphere>
       </group>
 
-      {/* Wings - Improved design */}
-      <group ref={leftWingRef} position={[-0.85, -0.15, 0.2]}>
+      {/* Soft rounded wings - kawaii style */}
+      <group ref={leftWingRef} position={[-0.9, -0.1, 0.3]}>
         <mesh castShadow receiveShadow>
-          <sphereGeometry args={[0.32, 32, 32]} />
-          <meshPhysicalMaterial
+          <sphereGeometry args={[0.28, 32, 32]} />
+          <meshStandardMaterial
             color={mainBodyColor}
-            roughness={0.18}
-            clearcoat={0.35}
+            roughness={0.85}
           />
         </mesh>
-        {/* Wing highlight */}
-        <Sphere args={[0.15, 16, 16]} position={[-0.12, 0.1, 0.15]}>
-          <meshStandardMaterial
-            color="#FFFACD"
-            transparent
-            opacity={0.5}
-          />
-        </Sphere>
       </group>
-      <group ref={rightWingRef} position={[0.85, -0.15, 0.2]}>
+      <group ref={rightWingRef} position={[0.9, -0.1, 0.3]}>
         <mesh castShadow receiveShadow>
-          <sphereGeometry args={[0.32, 32, 32]} />
-          <meshPhysicalMaterial
+          <sphereGeometry args={[0.28, 32, 32]} />
+          <meshStandardMaterial
             color={mainBodyColor}
-            roughness={0.18}
-            clearcoat={0.35}
+            roughness={0.85}
           />
         </mesh>
-        {/* Wing highlight */}
-        <Sphere args={[0.15, 16, 16]} position={[0.12, 0.1, 0.15]}>
-          <meshStandardMaterial
-            color="#FFFACD"
-            transparent
-            opacity={0.5}
-          />
-        </Sphere>
       </group>
 
       {/* Feet - Adorable orange feet */}
@@ -317,25 +307,23 @@ export default function DrChick3D({ animationState }: DrChick3DProps) {
         ))}
       </group>
 
-      {/* Professional stethoscope */}
-      <group ref={stethoscopeRef} position={[0, 0.3, 0.85]} scale={0.6}>
-        {/* Tube (torus) */}
+      {/* Simple cute stethoscope - less prominent */}
+      <group ref={stethoscopeRef} position={[0, 0.15, 0.92]} scale={0.4}>
+        {/* Minimal tube */}
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <torusGeometry args={[0.28, 0.025, 16, 64]} />
-          <meshPhysicalMaterial
-            color="#2C3E50"
-            roughness={0.4}
-            metalness={0.3}
+          <torusGeometry args={[0.35, 0.035, 12, 48]} />
+          <meshStandardMaterial
+            color="#5A6A7A"
+            roughness={0.6}
           />
         </mesh>
-        {/* Chest piece */}
-        <mesh position={[0, -0.35, 0]} castShadow>
-          <cylinderGeometry args={[0.1, 0.12, 0.08, 32]} />
-          <meshPhysicalMaterial
-            color="#95A5A6"
-            roughness={0.2}
-            metalness={0.8}
-            clearcoat={0.5}
+        {/* Small chest piece */}
+        <mesh position={[0, -0.42, 0]} castShadow>
+          <cylinderGeometry args={[0.12, 0.14, 0.1, 24]} />
+          <meshStandardMaterial
+            color="#B0BEC5"
+            roughness={0.5}
+            metalness={0.3}
           />
         </mesh>
       </group>

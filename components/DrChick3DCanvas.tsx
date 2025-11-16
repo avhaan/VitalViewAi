@@ -50,7 +50,7 @@ export default function DrChick3DCanvas({
   }
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-br from-[#F0F9FF] via-[#E0F2FE] to-[#F0F9FF] rounded-2xl overflow-hidden shadow-lg">
+    <div className="relative w-full h-full bg-gradient-to-br from-[#FFF5F7] via-[#FFF0F5] to-[#FFF8DC] rounded-2xl overflow-hidden shadow-lg">
       {/* Mood Bubble */}
       <AnimatePresence>
         {showMoodBubble && moodText && (
@@ -93,43 +93,44 @@ export default function DrChick3DCanvas({
         style={{ width: '100%', height: '100%' }}
       >
         <Suspense fallback={null}>
-          {/* Professional Studio Lighting Setup */}
-          <ambientLight intensity={0.5} />
+          {/* Soft KAWAII Lighting Setup */}
+          <ambientLight intensity={0.9} color="#FFF8F0" />
           
-          {/* Key light - main soft warm from top-front */}
+          {/* Gentle key light - soft and warm */}
           <directionalLight
-            position={[2, 4, 3]}
-            intensity={1.5}
-            color="#FFFEF0"
+            position={[2, 3, 4]}
+            intensity={0.8}
+            color="#FFF5E1"
             castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
-            shadow-camera-far={15}
-            shadow-camera-left={-3}
-            shadow-camera-right={3}
-            shadow-camera-top={3}
-            shadow-camera-bottom={-3}
+            shadow-mapSize-width={512}
+            shadow-mapSize-height={512}
+            shadow-camera-far={10}
+            shadow-camera-left={-2}
+            shadow-camera-right={2}
+            shadow-camera-top={2}
+            shadow-camera-bottom={-2}
+            shadow-bias={-0.0001}
           />
           
-          {/* Fill light - front-right */}
+          {/* Soft fill light */}
           <directionalLight
-            position={[3, 1, 4]}
-            intensity={0.7}
-            color="#F0F8FF"
+            position={[-2, 1, 3]}
+            intensity={0.5}
+            color="#FFF8DC"
           />
           
-          {/* Rim/back light - creates separation from background */}
-          <directionalLight
-            position={[-3, 2, -2]}
-            intensity={0.6}
-            color="#FFE4B5"
-          />
-          
-          {/* Subtle bottom light - softens shadows */}
+          {/* Pastel top light */}
           <pointLight
-            position={[0, -2, 2]}
+            position={[0, 4, 0]}
+            intensity={0.4}
+            color="#FFE4E1"
+          />
+          
+          {/* Bottom bounce light - very soft */}
+          <pointLight
+            position={[0, -1, 2]}
             intensity={0.3}
-            color="#E0F2FE"
+            color="#FFF0F5"
           />
 
           {/* Camera - optimal viewing angle */}
@@ -139,8 +140,8 @@ export default function DrChick3DCanvas({
             fov={40}
           />
 
-          {/* High quality environment for reflections */}
-          <Environment preset="city" environmentIntensity={0.3} />
+          {/* Soft environment for kawaii look */}
+          <Environment preset="dawn" environmentIntensity={0.2} />
 
           {/* Dr. Chick 3D Model */}
           <DrChick3D animationState={animationState} />
