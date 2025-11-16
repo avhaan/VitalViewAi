@@ -163,7 +163,12 @@ export default function MedicalChatBot() {
 
   // ElevenLabs Text-to-Speech Functions
   const speakText = async (text: string, messageId: string) => {
-    if (!ttsEnabled) return;
+    if (!ttsEnabled) {
+      console.log('TTS disabled by user');
+      return;
+    }
+    
+    console.log('🎤 Starting TTS for message:', messageId);
 
     // Stop any ongoing speech
     if (audioRef.current) {
@@ -232,11 +237,21 @@ export default function MedicalChatBot() {
           error: errorData,
           textPreview: cleanText.substring(0, 50)
         });
+        
         setSpeakingMessageId(null);
         setAudioLoading(false);
-        // Don't show error to user - just silently skip voice
+        
+        // Show user-friendly error message
         if (!muteAnimations) {
           resetToIdle();
+          const statusCode = response?.status || 0;
+          if (statusCode === 401 || statusCode === 500) {
+            setMood('ElevenLabs API key needed in .env.local', true);
+            setTimeout(() => setMood('', false), 4000);
+          } else {
+            setMood('Voice temporarily unavailable', true);
+            setTimeout(() => setMood('', false), 3000);
+          }
         }
         return; // Exit gracefully without throwing
       }
@@ -284,7 +299,13 @@ export default function MedicalChatBot() {
         }
       };
 
-      await audio.play();
+      // Play audio
+      await audio.play().catch((err) => {
+        console.error('Audio play failed:', err);
+        throw err; // Re-throw to be caught by outer catch
+      });
+      
+      console.log('✅ TTS playing successfully');
     } catch (error) {
       console.error('TTS error:', error);
       setSpeakingMessageId(null);
@@ -310,18 +331,9 @@ export default function MedicalChatBot() {
     }
   };
 
-  // Auto-speak new assistant messages if TTS is enabled
-  useEffect(() => {
-    if (ttsEnabled && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.role === 'assistant' && lastMessage.id !== 'welcome-message') {
-        // Small delay to let animation start
-        setTimeout(() => {
-          speakText(lastMessage.content, lastMessage.id);
-        }, 500);
-      }
-    }
-  }, [messages.length]);
+  // Note: Auto-speak disabled to comply with browser autoplay policies
+  // Users can click the speaker icon to play audio manually
+  // This prevents "NotAllowedError: play() failed" issues
 
   // Cleanup on unmount
   useEffect(() => {
