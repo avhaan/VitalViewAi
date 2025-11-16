@@ -74,12 +74,27 @@ export async function POST(request: NextRequest) {
 
     // Get the audio data
     const audioBuffer = await response.arrayBuffer();
+    
+    console.log('✅ Audio generated successfully:', {
+      size: audioBuffer.byteLength,
+      sizeKB: (audioBuffer.byteLength / 1024).toFixed(2) + 'KB'
+    });
+
+    // Validate audio buffer
+    if (audioBuffer.byteLength === 0) {
+      console.error('❌ Received empty audio buffer from ElevenLabs');
+      return NextResponse.json(
+        { error: 'Received empty audio from ElevenLabs' },
+        { status: 500 }
+      );
+    }
 
     // Return the audio file
     return new NextResponse(audioBuffer, {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': audioBuffer.byteLength.toString(),
+        'Cache-Control': 'no-cache',
       },
     });
   } catch (error) {

@@ -256,19 +256,36 @@ export default function MedicalChatBot() {
         return; // Exit gracefully without throwing
       }
 
-      // Get audio blob
+      // Get audio blob and validate
       const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('📦 Audio blob received:', {
+        size: audioBlob.size,
+        type: audioBlob.type
+      });
 
-      // Create and play audio
-      const audio = new Audio(audioUrl);
+      // Validate blob
+      if (audioBlob.size === 0) {
+        throw new Error('Received empty audio blob from API');
+      }
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('🔗 Audio URL created:', audioUrl);
+
+      // Create and configure audio element
+      const audio = new Audio();
       audioRef.current = audio;
 
-      // Gentle, natural voice settings
-      audio.playbackRate = 0.95;  // Slightly slower for gentler feel
-      audio.preservesPitch = true;  // Keep natural pitch
+      // Set up event listeners BEFORE setting src
+      audio.onloadeddata = () => {
+        console.log('✅ Audio loaded successfully, duration:', audio.duration);
+      };
+
+      audio.oncanplaythrough = () => {
+        console.log('✅ Audio can play through');
+      };
 
       audio.onplay = () => {
+        console.log('▶️ Audio started playing');
         setAudioLoading(false);
         if (!muteAnimations) {
           setAnimationState('responding');
@@ -277,6 +294,7 @@ export default function MedicalChatBot() {
       };
 
       audio.onended = () => {
+        console.log('⏹️ Audio finished playing');
         setSpeakingMessageId(null);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
@@ -286,26 +304,33 @@ export default function MedicalChatBot() {
         }
       };
 
-      audio.onerror = () => {
+      audio.onerror = (e) => {
+        console.error('❌ Audio playback error:', e, audio.error);
         setSpeakingMessageId(null);
         setAudioLoading(false);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
-        console.error('Audio playback error');
         if (!muteAnimations) {
           resetToIdle();
-          setMood('Error playing audio', true);
+          setMood('Audio playback failed', true);
           setTimeout(() => setMood('', false), 2000);
         }
       };
 
-      // Play audio
-      await audio.play().catch((err) => {
-        console.error('Audio play failed:', err);
-        throw err; // Re-throw to be caught by outer catch
-      });
+      // Set source and load
+      audio.src = audioUrl;
+      audio.load();
+
+      // Gentle voice settings
+      audio.playbackRate = 0.95;
+      audio.preservesPitch = true;
+
+      // Wait a moment for audio to load, then play
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      console.log('✅ TTS playing successfully');
+      console.log('🎬 Attempting to play audio...');
+      await audio.play();
+      console.log('✅ Audio.play() succeeded');
     } catch (error) {
       console.error('TTS error:', error);
       setSpeakingMessageId(null);
