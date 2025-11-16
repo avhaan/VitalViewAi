@@ -50,30 +50,34 @@ export default function DrChick3DCanvas({
   }
 
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-[#F0F9FF] via-[#E0F2FE] to-white rounded-2xl overflow-hidden shadow-inner">
+    <div className="relative w-full h-full bg-gradient-to-br from-[#F0F9FF] via-[#E0F2FE] to-[#F0F9FF] rounded-2xl overflow-hidden shadow-lg">
       {/* Mood Bubble */}
       <AnimatePresence>
         {showMoodBubble && moodText && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+            initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.8 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-10"
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
           >
-            <div className="bg-white px-4 py-2 rounded-full shadow-lg border-2 border-[#0B7BD6]">
-              <p className="text-sm font-medium text-[#0B7BD6]">{moodText}</p>
+            <div className="bg-white/95 backdrop-blur-sm px-4 py-2.5 rounded-2xl shadow-xl border-2 border-[#0B7BD6]/50">
+              <p className="text-sm font-semibold text-[#0B7BD6]">{moodText}</p>
             </div>
             {/* Bubble tail */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-white/95" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Heartbeat icon */}
+      {/* Animated heartbeat icon */}
       <motion.div
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute top-4 right-4 text-2xl z-10"
+        animate={{ 
+          scale: [1, 1.15, 1],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute top-3 right-3 text-2xl z-10 drop-shadow-lg"
       >
         💗
       </motion.div>
@@ -89,54 +93,69 @@ export default function DrChick3DCanvas({
         style={{ width: '100%', height: '100%' }}
       >
         <Suspense fallback={null}>
-          {/* Lighting Setup - Soft and glossy for cute chick */}
-          <ambientLight intensity={0.7} />
+          {/* Professional Studio Lighting Setup */}
+          <ambientLight intensity={0.5} />
           
-          {/* Main light - soft warm from above */}
+          {/* Key light - main soft warm from top-front */}
           <directionalLight
-            position={[3, 5, 4]}
-            intensity={1.2}
-            color="#FFFACD"
+            position={[2, 4, 3]}
+            intensity={1.5}
+            color="#FFFEF0"
             castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-far={15}
+            shadow-camera-left={-3}
+            shadow-camera-right={3}
+            shadow-camera-top={3}
+            shadow-camera-bottom={-3}
           />
           
-          {/* Fill light - front */}
+          {/* Fill light - front-right */}
           <directionalLight
-            position={[0, 0, 5]}
+            position={[3, 1, 4]}
+            intensity={0.7}
+            color="#F0F8FF"
+          />
+          
+          {/* Rim/back light - creates separation from background */}
+          <directionalLight
+            position={[-3, 2, -2]}
             intensity={0.6}
-            color="#FFFFFF"
-          />
-          
-          {/* Rim light - subtle back highlight */}
-          <directionalLight
-            position={[-2, 2, -3]}
-            intensity={0.3}
             color="#FFE4B5"
           />
-
-          {/* Camera */}
-          <PerspectiveCamera
-            makeDefault
-            position={[0, 0.5, 4.5]}
-            fov={45}
+          
+          {/* Subtle bottom light - softens shadows */}
+          <pointLight
+            position={[0, -2, 2]}
+            intensity={0.3}
+            color="#E0F2FE"
           />
 
-          {/* Environment for reflections */}
-          <Environment preset="sunset" />
+          {/* Camera - optimal viewing angle */}
+          <PerspectiveCamera
+            makeDefault
+            position={[0, 0.8, 4.2]}
+            fov={40}
+          />
+
+          {/* High quality environment for reflections */}
+          <Environment preset="city" environmentIntensity={0.3} />
 
           {/* Dr. Chick 3D Model */}
           <DrChick3D animationState={animationState} />
 
-          {/* Orbit Controls - Limited for subtle interaction */}
+          {/* Smooth Orbit Controls */}
           <OrbitControls
             enableZoom={false}
             enablePan={false}
-            minPolarAngle={Math.PI / 3}
-            maxPolarAngle={Math.PI / 2}
-            minAzimuthAngle={-Math.PI / 6}
-            maxAzimuthAngle={Math.PI / 6}
+            minPolarAngle={Math.PI / 3.5}
+            maxPolarAngle={Math.PI / 2.2}
+            minAzimuthAngle={-Math.PI / 5}
+            maxAzimuthAngle={Math.PI / 5}
             enableDamping
-            dampingFactor={0.05}
+            dampingFactor={0.08}
+            rotateSpeed={0.5}
           />
         </Suspense>
       </Canvas>

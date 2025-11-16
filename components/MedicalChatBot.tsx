@@ -335,41 +335,70 @@ export default function MedicalChatBot() {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button - Polished with pulse animation */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-[#0B7BD6] to-[#66D1C9] rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:shadow-3xl transition-shadow"
+            initial={{ scale: 0, opacity: 0, rotate: -180 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            exit={{ scale: 0, opacity: 0, rotate: 180 }}
+            whileHover={{ scale: 1.08, y: -4 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className="fixed bottom-6 right-6 w-20 h-20 bg-gradient-to-br from-[#0B7BD6] via-[#3BA5D9] to-[#66D1C9] rounded-full shadow-2xl flex items-center justify-center z-50 cursor-pointer hover:shadow-[0_20px_50px_rgba(11,123,214,0.4)] transition-shadow ring-4 ring-white/50"
           >
-            🐥
+            {/* Pulse rings */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-gradient-to-br from-[#0B7BD6] to-[#66D1C9] opacity-30"
+              animate={{
+                scale: [1, 1.3, 1.3, 1],
+                opacity: [0.3, 0, 0, 0.3]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+            />
+            <span className="text-4xl drop-shadow-lg relative z-10">🐥</span>
+            {/* Helper tooltip */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1, duration: 0.3 }}
+              className="absolute -top-14 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-lg whitespace-nowrap pointer-events-none"
+            >
+              <p className="text-sm font-medium text-gray-800">Chat with Dr. Chick! 💬</p>
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white" />
+            </motion.div>
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
+      {/* Chat Window - Enhanced Design */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            initial={{ opacity: 0, y: 100, scale: 0.85 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            className="fixed bottom-6 right-6 w-[700px] h-[700px] bg-white rounded-3xl shadow-2xl z-50 flex flex-col overflow-hidden border-2 border-[#0B7BD6]/20"
+            exit={{ opacity: 0, y: 100, scale: 0.85 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed bottom-6 right-6 w-[720px] h-[720px] bg-white rounded-3xl shadow-[0_25px_80px_rgba(11,123,214,0.25)] z-50 flex flex-col overflow-hidden border border-gray-200"
           >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-[#0B7BD6] to-[#66D1C9] p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-2xl">
+            {/* Header - Polished */}
+            <div className="bg-gradient-to-r from-[#0B7BD6] via-[#3BA5D9] to-[#66D1C9] p-5 flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-4">
+                <motion.div 
+                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-3xl shadow-md ring-2 ring-white/30"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
                   🐥
-                </div>
+                </motion.div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">Dr. Chick</h3>
-                  <p className="text-white/80 text-xs">Your VitalView AI Health Buddy</p>
+                  <h3 className="text-white font-bold text-lg tracking-tight">Dr. Chick AI</h3>
+                  <p className="text-white/90 text-xs font-medium">Your VitalView Health Assistant</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -418,18 +447,27 @@ export default function MedicalChatBot() {
                   />
                 </div>
                 
-                {/* Dr. Chick Info Card */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-[#0B7BD6]/20">
-                  <p className="text-xs text-center text-gray-600">
-                    <span className="font-semibold text-[#0B7BD6]">Dr. Chick</span> is here to help!
+                {/* Dr. Chick Status Card - Enhanced */}
+                <motion.div 
+                  className="bg-gradient-to-br from-white to-[#F0F9FF] rounded-xl p-4 border border-[#0B7BD6]/20 shadow-sm"
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <p className="text-xs text-center text-gray-700 font-medium">
+                    <span className="font-bold text-[#0B7BD6]">Dr. Chick</span> is here!
                   </p>
-                  <p className="text-[10px] text-center text-gray-400 mt-1">
-                    {animationState === 'idle' && '💤 Ready to assist'}
-                    {animationState === 'wave' && '👋 Greeting you'}
-                    {animationState === 'listen' && '👂 Listening'}
-                    {animationState === 'responding' && '🧠 Thinking'}
-                  </p>
-                </div>
+                  <motion.p 
+                    key={animationState}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-[11px] text-center text-gray-500 mt-2 font-medium"
+                  >
+                    {animationState === 'idle' && '💤 Ready to help'}
+                    {animationState === 'wave' && '👋 Hello there!'}
+                    {animationState === 'listen' && '👂 Listening carefully'}
+                    {animationState === 'responding' && '🧠 Analyzing...'}
+                  </motion.p>
+                </motion.div>
               </div>
 
               {/* Messages - Right Side */}
